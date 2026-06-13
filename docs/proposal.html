@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>微信群智能AI客服 需求与方案（通用版 V1.0）</title>
+<style>
+  :root{
+    --primary:#1a6b54; --primary-light:#e8f4f0; --accent:#0b7a5e;
+    --text:#2b2b2b; --muted:#6b7280; --border:#e5e7eb; --bg:#f7f9f8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;color:var(--text);background:var(--bg);line-height:1.75;font-size:15px}
+  .wrap{max-width:960px;margin:0 auto;padding:32px 24px 80px}
+  header{background:linear-gradient(135deg,#0f5743,#1a8a6a);color:#fff;border-radius:12px;padding:36px 32px;margin-bottom:32px}
+  header h1{font-size:26px;margin-bottom:8px}
+  header p{opacity:.9;font-size:14px}
+  h2{font-size:20px;color:var(--primary);margin:36px 0 14px;padding-left:12px;border-left:4px solid var(--primary)}
+  h3{font-size:16px;margin:20px 0 8px;color:#0f5743}
+  p{margin-bottom:10px}
+  table{width:100%;border-collapse:collapse;margin:12px 0 20px;background:#fff;font-size:14px}
+  th,td{border:1px solid var(--border);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--primary-light);color:var(--primary);font-weight:600;white-space:nowrap}
+  tr:nth-child(even) td{background:#fafcfb}
+  .card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin:12px 0}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .tag{display:inline-block;background:var(--primary-light);color:var(--accent);border-radius:4px;padding:1px 8px;font-size:12px;margin-right:6px}
+  .flow{background:#fff;border:1px dashed var(--primary);border-radius:10px;padding:16px 20px;margin:12px 0;font-size:14px;color:#0f5743}
+  ul,ol{margin:0 0 12px 22px}
+  li{margin-bottom:5px}
+  .note{background:#fff8e6;border-left:4px solid #e6a817;padding:10px 14px;border-radius:0 8px 8px 0;font-size:13.5px;color:#7a5b00;margin:14px 0}
+  footer{margin-top:48px;color:var(--muted);font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>微信群智能AI客服 — 需求与实施方案</h1>
+  <p>通用基础版 V1.0 ｜ 适用于各类业务的微信群客户服务场景 ｜ 2026-06</p>
+</header>
+
+<h2>一、项目背景与目标</h2>
+<div class="card">
+  <p>企业通过微信群触达和服务客户，但人工客服存在响应不及时、夜间无人值守、答复口径不统一、潜在商机流失等问题。本方案旨在搭建一套<strong>通用型微信群智能AI客服系统</strong>，不区分客户类型，作为基础能力覆盖售前与售后全流程。</p>
+  <p><strong>核心目标：</strong></p>
+  <ul>
+    <li>7×24小时秒级响应群内客户咨询，首次响应时间 ≤ 5 秒；</li>
+    <li>基于知识库与服务案例库提供精准、口径统一的解答，问题自助解决率 ≥ 70%；</li>
+    <li>自动识别高意向客户并实时推送销售团队，提升商机转化；</li>
+    <li>AI 无法处理时平滑转人工，全程留痕、可追溯、可统计。</li>
+  </ul>
+</div>
+
+<h2>二、角色与服务范围</h2>
+<table>
+  <tr><th>角色</th><th>说明</th></tr>
+  <tr><td>客户（通用）</td><td>群内任意成员，不区分新老客户、不分级，统一服务标准</td></tr>
+  <tr><td>AI客服机器人</td><td>群内常驻，自动应答、识别意图、分流转接</td></tr>
+  <tr><td>人工客服</td><td>接管 AI 升级的会话，处理复杂/投诉类问题</td></tr>
+  <tr><td>销售团队</td><td>接收高意向客户线索，跟进转化</td></tr>
+  <tr><td>管理员</td><td>维护知识库、配置规则、查看数据看板</td></tr>
+</table>
+
+<h2>三、功能需求</h2>
+
+<h3>3.1 售前场景</h3>
+<table>
+  <tr><th>编号</th><th>功能</th><th>需求描述</th></tr>
+  <tr><td>S1</td><td>7×24 咨询应答</td><td>全天候响应产品/服务咨询：功能介绍、价格、版本对比、合作流程等；非工作时间自动声明并保证基础答复质量。</td></tr>
+  <tr><td>S2</td><td>产品推荐</td><td>根据客户描述的需求场景，推荐匹配的产品/服务方案，支持多轮追问澄清。</td></tr>
+  <tr><td>S3</td><td>高意向客户识别</td><td>基于关键词（价格、试用、签约、对接人等）、提问频次、互动深度自动打分；达到阈值即推送销售（含客户昵称、群名、聊天摘要、意向标签）。</td></tr>
+  <tr><td>S4</td><td>资料自动发送</td><td>按需自动推送产品手册、报价单、案例 PDF、演示视频链接等物料。</td></tr>
+  <tr><td>S5</td><td>活动/营销触达</td><td>支持向指定群定时群发新品发布、促销活动、直播预告等通知（频次可控，防打扰）。</td></tr>
+  <tr><td>S6</td><td>竞品对比应答</td><td>对竞品对比类提问按预设口径回复，避免不当承诺。</td></tr>
+</table>
+
+<h3>3.2 售后场景</h3>
+<table>
+  <tr><th>编号</th><th>功能</th><th>需求描述</th></tr>
+  <tr><td>A1</td><td>常见问题解答</td><td>基于服务案例库/FAQ 解答使用问题、故障排查、操作指引，支持图文+步骤化回复。</td></tr>
+  <tr><td>A2</td><td>工单自动创建</td><td>识别到故障/投诉/需求类信息时自动创建工单，回执工单号；同步至工单/CRM系统。</td></tr>
+  <tr><td>A3</td><td>进度查询</td><td>客户可查询订单、工单、物流、退换货等处理进度（对接业务系统接口）。</td></tr>
+  <tr><td>A4</td><td>投诉升级</td><td>识别投诉、负面情绪、重复追问，自动升级人工并通知主管，标记紧急程度。</td></tr>
+  <tr><td>A5</td><td>满意度回访</td><td>问题关闭后自动发起满意度评价；差评自动触发人工回访任务。</td></tr>
+  <tr><td>A6</td><td>到期/续费提醒</td><td>对服务到期、续费、保养等节点自动私信或群内提醒（可配置）。</td></tr>
+</table>
+
+<h3>3.3 通用基础能力</h3>
+<table>
+  <tr><th>编号</th><th>功能</th><th>需求描述</th></tr>
+  <tr><td>G1</td><td>意图识别与分流</td><td>自动判断售前/售后/闲聊/无效消息，按意图路由不同处理流程；闲聊与群内成员互聊不响应（可配置@触发或关键词触发）。</td></tr>
+  <tr><td>G2</td><td>知识库（RAG）</td><td>支持上传文档（Word/PDF/Excel/网页）自动切片入库；回答附带来源；知识可按版本管理、定期更新。</td></tr>
+  <tr><td>G3</td><td>案例库自学习</td><td>人工客服的优质答复经审核后沉淀为新案例，知识库持续进化。</td></tr>
+  <tr><td>G4</td><td>人机协同转接</td><td>三次未解决/客户主动要求/敏感场景 → 转人工；转接时携带完整上下文摘要；人工介入期间 AI 静默。</td></tr>
+  <tr><td>G5</td><td>多群管理</td><td>一个后台管理 N 个客户群，支持按群配置不同知识库、话术风格、触发规则。</td></tr>
+  <tr><td>G6</td><td>敏感词与合规</td><td>敏感词拦截、回复内容审核、禁止承诺类话术（如保证收益）；客户数据脱敏存储。</td></tr>
+  <tr><td>G7</td><td>数据看板</td><td>统计咨询量、解决率、响应时长、转人工率、高意向线索数、热门问题 TOP10、满意度等，支持导出。</td></tr>
+  <tr><td>G8</td><td>消息形式</td><td>支持文本、图片识别（客户发截图报错可识别）、链接卡片、文件等多模态收发。</td></tr>
+</table>
+
+<h2>四、补充场景建议（增值能力）</h2>
+<div class="grid">
+  <div class="card"><span class="tag">售前</span><strong>新人入群欢迎</strong><p>新成员入群自动发送欢迎语+服务指引+常见问题入口，降低首问门槛。</p></div>
+  <div class="card"><span class="tag">售前</span><strong>静默客户激活</strong><p>识别长期不发言但曾有咨询的成员，定向推送相关内容唤醒。</p></div>
+  <div class="card"><span class="tag">售后</span><strong>故障截图诊断</strong><p>客户发送报错截图，AI 通过图像识别定位问题并给出排查步骤。</p></div>
+  <div class="card"><span class="tag">售后</span><strong>批量公告应答</strong><p>系统升级/故障期间自动统一答复相关咨询，减轻人工压力。</p></div>
+  <div class="card"><span class="tag">通用</span><strong>群消息日报</strong><p>每日自动生成群内咨询摘要、未解决问题清单、风险预警，推送管理员。</p></div>
+  <div class="card"><span class="tag">通用</span><strong>舆情/风险预警</strong><p>监测群内集中负面情绪、退款潮、竞品挖角等异常，实时告警。</p></div>
+  <div class="card"><span class="tag">通用</span><strong>多语言支持</strong><p>自动识别客户语言并以对应语言回复（按需开启）。</p></div>
+  <div class="card"><span class="tag">通用</span><strong>私聊承接</strong><p>涉及报价、个人信息等不宜群内公开的内容，引导至私聊由 AI 继续服务。</p></div>
+</div>
+
+<h2>五、系统架构方案</h2>
+<div class="flow">
+  <strong>整体链路：</strong><br>
+  微信群消息 → 接入层（企业微信机器人 / 群代理账号）→ 消息网关（去重、限流、触发规则）→ 意图识别引擎 → ① 知识库 RAG 检索 + 大模型生成回答 → 合规审核 → 回复入群；② 高意向 → 线索引擎 → 推送销售（企微/CRM）；③ 复杂问题 → 人工坐席工作台
+</div>
+<table>
+  <tr><th>层级</th><th>组成</th><th>说明</th></tr>
+  <tr><td>接入层</td><td>企业微信群机器人 / 微信群托管账号</td><td>推荐企业微信方案（官方 API、合规稳定）；个人微信群需托管方案，存在封号风险，需评估</td></tr>
+  <tr><td>对话引擎</td><td>大语言模型（LLM）+ 意图识别 + 多轮对话管理</td><td>支持上下文记忆、追问澄清、人设话术配置</td></tr>
+  <tr><td>知识层</td><td>RAG 知识库 + 服务案例库 + FAQ</td><td>向量检索 + 关键词混合检索，答案带来源，杜绝幻觉乱答</td></tr>
+  <tr><td>业务集成</td><td>CRM / 工单 / 订单 / 物流接口</td><td>标准 API 对接，线索与工单双向同步</td></tr>
+  <tr><td>人工协同</td><td>客服工作台</td><td>会话接管、上下文摘要、答复建议（AI 辅助人工）</td></tr>
+  <tr><td>管理后台</td><td>知识库管理、规则配置、数据看板、权限管理</td><td>管理员自助维护，无需技术介入</td></tr>
+</table>
+
+<h2>六、关键流程</h2>
+<h3>6.1 售前咨询 → 线索转化</h3>
+<div class="flow">客户群内提问 → AI 应答 + 推送资料 → 持续对话中意向打分 → 达阈值生成线索卡片（客户信息+聊天摘要+意向标签）→ 实时推送对应销售 → 销售跟进结果回写 → 数据看板统计转化漏斗</div>
+<h3>6.2 售后问题 → 闭环处理</h3>
+<div class="flow">客户反馈问题 → AI 检索案例库给出解决步骤 → 解决：自动发起满意度评价；未解决：创建工单 + 转人工（带上下文）→ 处理完成回执客户 → 优质答复沉淀回案例库</div>
+
+<h2>七、实施计划（建议）</h2>
+<table>
+  <tr><th>阶段</th><th>周期</th><th>内容</th><th>交付物</th></tr>
+  <tr><td>一期：基础上线</td><td>2–4 周</td><td>群接入、知识库搭建、售前/售后自动应答、转人工</td><td>可用的群内 AI 客服</td></tr>
+  <tr><td>二期：商机与工单</td><td>3–4 周</td><td>高意向识别推送、工单对接、满意度回访</td><td>线索/工单闭环</td></tr>
+  <tr><td>三期：运营深化</td><td>持续</td><td>数据看板、案例自学习、营销触达、预警日报</td><td>运营增值能力</td></tr>
+</table>
+
+<h2>八、验收指标（KPI）</h2>
+<table>
+  <tr><th>指标</th><th>目标值</th></tr>
+  <tr><td>首次响应时间</td><td>≤ 5 秒</td></tr>
+  <tr><td>问题自助解决率</td><td>≥ 70%</td></tr>
+  <tr><td>回答准确率（抽检）</td><td>≥ 90%</td></tr>
+  <tr><td>转人工率</td><td>≤ 30%，且转接上下文完整率 100%</td></tr>
+  <tr><td>高意向线索推送时效</td><td>≤ 1 分钟</td></tr>
+  <tr><td>客户满意度（CSAT）</td><td>≥ 90%</td></tr>
+</table>
+
+<h2>九、风险与对策</h2>
+<table>
+  <tr><th>风险</th><th>对策</th></tr>
+  <tr><td>AI 回答错误/幻觉</td><td>严格限定知识库范围作答，无把握时回复"已记录，将由专员跟进"并转人工</td></tr>
+  <tr><td>个人微信群封号风险</td><td>优先采用企业微信官方方案；个人微信方案控制频率、模拟真人节奏</td></tr>
+  <tr><td>群内打扰客户</td><td>仅@触发/关键词触发可配置；营销消息限频；闲聊不插话</td></tr>
+  <tr><td>数据安全合规</td><td>聊天数据加密存储、客户信息脱敏、访问权限分级、符合个人信息保护法要求</td></tr>
+  <tr><td>知识库过时</td><td>建立更新责任人机制 + 案例自学习 + 定期巡检低分回答</td></tr>
+</table>
+
+<div class="note">说明：本方案为通用基础版需求框架，不区分客户类型，统一服务标准。具体业务系统接口（CRM/工单/订单）、接入方式（企业微信 vs 个人微信托管）需在立项后确认。</div>
+
+<footer>微信群智能AI客服需求与方案 ｜ 通用基础版 V1.0</footer>
+</div>
+</body>
+</html>

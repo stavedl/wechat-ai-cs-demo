@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>微信群智能AI客服 — 方案与对话演示（JSON数据版）</title>
+<style>
+  :root{
+    --primary:#1a6b54; --primary-light:#e8f4f0; --accent:#0b7a5e;
+    --wx-bg:#ededed; --wx-green:#95ec69; --text:#2b2b2b; --muted:#6b7280; --border:#e5e7eb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);background:#f4f6f5;line-height:1.7;font-size:15px}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 20px 80px}
+  header{background:linear-gradient(135deg,#0f5743,#1a8a6a);color:#fff;border-radius:14px;padding:32px;margin-bottom:28px}
+  header h1{font-size:25px;margin-bottom:6px}
+  header p{opacity:.9;font-size:13.5px}
+  h2{font-size:19px;color:var(--primary);margin:34px 0 14px;padding-left:12px;border-left:4px solid var(--primary)}
+  h3{font-size:15.5px;margin:18px 0 8px;color:#0f5743}
+  table{width:100%;border-collapse:collapse;margin:10px 0 18px;background:#fff;font-size:13.5px}
+  th,td{border:1px solid var(--border);padding:8px 11px;text-align:left;vertical-align:top}
+  th{background:var(--primary-light);color:var(--primary);font-weight:600;white-space:nowrap}
+  .card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin:10px 0}
+  ul{margin:0 0 10px 22px}
+  .note{background:#fff8e6;border-left:4px solid #e6a817;padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;color:#7a5b00;margin:14px 0}
+  .flow{background:#fff;border:1px dashed var(--primary);border-radius:10px;padding:14px 18px;margin:10px 0;font-size:13.5px;color:#0f5743}
+
+  /* ===== demo layout ===== */
+  .demo{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+  @media(max-width:860px){.demo{grid-template-columns:1fr}}
+  .scenarios{display:flex;flex-direction:column;gap:10px}
+  .sc-btn{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;text-align:left;cursor:pointer;font-size:14px;transition:.15s;font-family:inherit}
+  .sc-btn:hover{border-color:var(--accent);background:var(--primary-light)}
+  .sc-btn.active{border-color:var(--accent);background:var(--primary-light);box-shadow:0 0 0 2px rgba(11,122,94,.15)}
+  .sc-btn b{display:block;color:var(--primary);margin-bottom:2px}
+  .sc-btn span{font-size:12.5px;color:var(--muted)}
+
+  /* ===== phone / wechat ===== */
+  .phone{background:#111;border-radius:28px;padding:10px;max-width:420px;margin:0 auto;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+  .screen{background:var(--wx-bg);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;height:640px}
+  .wx-header{background:#ededed;border-bottom:1px solid #d9d9d9;padding:12px 14px;text-align:center;font-weight:600;font-size:15px;position:relative}
+  .wx-header small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
+  .chat{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:12px}
+  .msg{display:flex;gap:8px;max-width:88%;animation:pop .25s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .msg .avatar{width:34px;height:34px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:700}
+  .msg .body{display:flex;flex-direction:column;gap:3px}
+  .msg .name{font-size:11px;color:var(--muted);padding:0 2px}
+  .bubble{padding:9px 12px;border-radius:8px;font-size:13.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+  .msg.customer .avatar{background:#5b8def}
+  .msg.customer .bubble{background:#fff}
+  .msg.ai{flex-direction:row}
+  .msg.ai .avatar{background:linear-gradient(135deg,#0f5743,#27a87f)}
+  .msg.ai .bubble{background:var(--wx-green)}
+  .msg.human .avatar{background:#e6792e}
+  .msg.human .bubble{background:#ffe9d6}
+  .sys{align-self:center;background:#dcdcdc;color:#555;font-size:11.5px;padding:3px 12px;border-radius:12px;max-width:90%;text-align:center;animation:pop .25s ease}
+  .alert-card{align-self:center;background:#fff;border:1.5px solid #e6a817;border-radius:10px;padding:10px 14px;font-size:12.5px;max-width:92%;animation:pop .25s ease;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+  .alert-card b{color:#b07700;display:block;margin-bottom:4px}
+  .lead-card{align-self:center;background:#fff;border:1.5px solid var(--accent);border-radius:10px;padding:10px 14px;font-size:12.5px;max-width:92%;animation:pop .25s ease;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+  .lead-card b{color:var(--accent);display:block;margin-bottom:4px}
+  .typing{display:inline-flex;gap:4px;padding:12px 14px;background:var(--wx-green);border-radius:8px}
+  .typing i{width:6px;height:6px;border-radius:50%;background:#3a7a3a;animation:blink 1s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  .wx-input{display:flex;gap:8px;padding:10px;background:#f7f7f7;border-top:1px solid #d9d9d9}
+  .wx-input input{flex:1;border:1px solid #ddd;border-radius:6px;padding:8px 12px;font-size:13.5px;outline:none;font-family:inherit}
+  .wx-input button{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:13.5px;cursor:pointer;font-family:inherit}
+  .wx-input button:disabled{opacity:.5;cursor:default}
+  .demo-controls{display:flex;gap:10px;margin-top:12px;justify-content:center}
+  .demo-controls button{background:#fff;border:1.5px solid var(--accent);color:var(--accent);border-radius:8px;padding:7px 18px;cursor:pointer;font-size:13.5px;font-family:inherit}
+  .demo-controls button:hover{background:var(--primary-light)}
+  .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+  footer{margin-top:48px;color:var(--muted);font-size:12px;text-align:center}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  .tag{display:inline-block;background:var(--primary-light);color:var(--accent);border-radius:4px;padding:1px 8px;font-size:12px;margin-right:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>微信群智能AI客服 — 解决方案 · 对话演示版（JSON数据版）</h1>
+  <p>通用基础版 V1.1 ｜ 售前 + 售后 ｜ 7×24 小时 ｜ 点击下方场景，观看 AI 客服真实对话演示</p>
+</header>
+
+<!-- ================= 对话演示 ================= -->
+<h2>一、对话演示（点击场景播放）</h2>
+<div class="demo">
+  <div class="scenarios" id="scenarioList"></div>
+  <div>
+    <div class="phone">
+      <div class="screen">
+        <div class="wx-header">产品服务交流群 (86)<small>AI客服小智 · 在线 7×24</small></div>
+        <div class="chat" id="chat"></div>
+        <div class="wx-input">
+          <input id="userInput" placeholder="试试输入：价格 / 报错 / 转人工 / 退款…" onkeydown="if(event.key==='Enter')sendFree()">
+          <button onclick="sendFree()" id="sendBtn">发送</button>
+        </div>
+      </div>
+    </div>
+    <div class="demo-controls">
+      <button onclick="replay()">⟳ 重播当前场景</button>
+      <button onclick="clearChat(true)">清空对话</button>
+    </div>
+    <div class="hint">演示为模拟数据，仅用于展示交互效果；也可在输入框自由提问体验关键词应答</div>
+  </div>
+</div>
+
+<!-- ================= 方案正文 ================= -->
+<h2>二、项目背景与目标</h2>
+<div class="card">
+  <p>企业通过微信群触达和服务客户，但人工客服存在响应不及时、夜间无人值守、答复口径不统一、潜在商机流失等问题。本方案搭建一套<strong>通用型微信群智能AI客服系统</strong>，不区分客户类型，统一服务标准，覆盖售前、售中、售后全流程。</p>
+  <ul>
+    <li>7×24 小时秒级响应，首次响应 ≤ 5 秒；</li>
+    <li>基于知识库与服务案例库精准解答，自助解决率 ≥ 70%；</li>
+    <li>自动识别高意向客户并实时推送销售团队；</li>
+    <li>AI 无法处理时平滑转人工，全程留痕、可统计。</li>
+  </ul>
+</div>
+
+<h2>三、功能需求</h2>
+<h3>3.1 售前场景</h3>
+<table>
+  <tr><th>编号</th><th>功能</th><th>需求描述</th></tr>
+  <tr><td>S1</td><td>7×24 咨询应答</td><td>全天候响应产品/服务咨询：功能、价格、版本对比、合作流程等。</td></tr>
+  <tr><td>S2</td><td>产品推荐</td><td>根据客户需求场景推荐匹配方案，支持多轮追问澄清。</td></tr>
+  <tr><td>S3</td><td>高意向客户识别</td><td>基于关键词（价格、试用、签约）、提问频次、互动深度打分，达阈值即推送销售（含聊天摘要与意向标签）。</td></tr>
+  <tr><td>S4</td><td>资料自动发送</td><td>按需推送产品手册、报价单、案例、演示视频链接。</td></tr>
+  <tr><td>S5</td><td>活动/营销触达</td><td>定时群发新品、促销、直播通知，频次可控防打扰。</td></tr>
+  <tr><td>S6</td><td>竞品对比应答</td><td>按预设口径回复竞品对比类提问，避免不当承诺。</td></tr>
+</table>
+<h3>3.2 售中场景（示例业务：在线课程购买）</h3>
+<table>
+  <tr><th>编号</th><th>功能</th><th>需求描述</th></tr>
+  <tr><td>M1</td><td>下单引导</td><td>客户表达购买意向后，AI 按需求匹配班型/套餐（基础/进阶），多轮澄清后生成下单链接或订单。</td></tr>
+  <tr><td>M2</td><td>优惠核销</td><td>自动识别客户可用优惠（群专属券、限时折扣、老学员价），下单时直接核算到手价。</td></tr>
+  <tr><td>M3</td><td>催付挽单</td><td>订单创建后未支付（如 30 分钟）自动提醒，结合优惠到期、名额紧张话术挽单；识别犹豫原因并答疑或转课程顾问。</td></tr>
+  <tr><td>M4</td><td>支付确认与回执</td><td>支付成功自动回执订单信息、开班时间、后续安排（拉班级群、预习资料、开发票入口）。</td></tr>
+  <tr><td>M5</td><td>履约提醒</td><td>开班前 N 天自动提醒、推送预习资料；实物类业务对应发货/物流通知。</td></tr>
+  <tr><td>M6</td><td>改单/退款受理</td><td>换班、改期、退款申请自助受理，按规则自动处理或转人工审核。</td></tr>
+  <tr><td>M7</td><td>成交同步</td><td>成交后自动推送运营/销售（含转化路径），分配班主任/客户成功，进入服务交接流程。</td></tr>
+</table>
+<h3>3.3 售后场景</h3>
+<table>
+  <tr><th>编号</th><th>功能</th><th>需求描述</th></tr>
+  <tr><td>A1</td><td>常见问题解答</td><td>基于案例库/FAQ 解答使用问题、故障排查，支持图文+步骤化回复。</td></tr>
+  <tr><td>A2</td><td>工单自动创建</td><td>识别故障/投诉/需求自动建单并回执工单号，同步工单/CRM系统。</td></tr>
+  <tr><td>A3</td><td>进度查询</td><td>查询订单、工单、物流、退换货进度（对接业务系统）。</td></tr>
+  <tr><td>A4</td><td>投诉升级</td><td>识别投诉与负面情绪自动升级人工并通知主管。</td></tr>
+  <tr><td>A5</td><td>满意度回访</td><td>问题关闭后自动发起评价，差评触发人工回访。</td></tr>
+  <tr><td>A6</td><td>到期/续费提醒</td><td>服务到期、续费、保养节点自动提醒（可配置）。</td></tr>
+</table>
+<h3>3.4 通用基础能力</h3>
+<table>
+  <tr><th>编号</th><th>功能</th><th>需求描述</th></tr>
+  <tr><td>G1</td><td>意图识别与分流</td><td>自动判断售前/售后/闲聊，按意图路由；闲聊不响应（可配置@触发）。</td></tr>
+  <tr><td>G2</td><td>知识库（RAG）</td><td>文档自动切片入库，回答带来源，版本化管理。</td></tr>
+  <tr><td>G3</td><td>案例库自学习</td><td>人工优质答复审核后沉淀为新案例，持续进化。</td></tr>
+  <tr><td>G4</td><td>人机协同转接</td><td>三次未解决/主动要求/敏感场景转人工，携带上下文摘要，人工介入时 AI 静默。</td></tr>
+  <tr><td>G5</td><td>多群管理</td><td>一个后台管理 N 个群，按群配置知识库、话术、规则。</td></tr>
+  <tr><td>G6</td><td>敏感词与合规</td><td>敏感词拦截、回复审核、数据脱敏存储。</td></tr>
+  <tr><td>G7</td><td>数据看板</td><td>咨询量、解决率、响应时长、转人工率、线索数、热门问题、满意度统计。</td></tr>
+  <tr><td>G8</td><td>多模态消息</td><td>文本、图片识别（报错截图）、链接卡片、文件收发。</td></tr>
+</table>
+
+<h2>四、补充场景（增值能力）</h2>
+<div class="grid2">
+  <div class="card"><span class="tag">售前</span><strong>新人入群欢迎</strong><p>自动发送欢迎语+服务指引，降低首问门槛。</p></div>
+  <div class="card"><span class="tag">售前</span><strong>静默客户激活</strong><p>识别沉默成员，定向推送内容唤醒。</p></div>
+  <div class="card"><span class="tag">售后</span><strong>故障截图诊断</strong><p>图像识别定位报错，给出排查步骤。</p></div>
+  <div class="card"><span class="tag">售后</span><strong>批量公告应答</strong><p>系统升级/故障期间统一答复，减轻人工压力。</p></div>
+  <div class="card"><span class="tag">通用</span><strong>群消息日报</strong><p>每日生成咨询摘要、未解决清单、风险预警。</p></div>
+  <div class="card"><span class="tag">通用</span><strong>舆情/风险预警</strong><p>监测集中负面情绪、退款潮等异常，实时告警。</p></div>
+  <div class="card"><span class="tag">通用</span><strong>私聊承接</strong><p>报价等敏感内容引导至私聊继续服务。</p></div>
+  <div class="card"><span class="tag">通用</span><strong>多语言支持</strong><p>自动识别客户语言并以对应语言回复。</p></div>
+</div>
+
+<h2>五、系统架构</h2>
+<div class="flow"><strong>整体链路：</strong>微信群消息 → 接入层（企业微信机器人/群托管账号）→ 消息网关（去重、限流、触发规则）→ 意图识别引擎 → ① RAG 检索 + 大模型生成 → 合规审核 → 回复入群；② 高意向 → 线索引擎 → 推送销售（企微/CRM）；③ 复杂问题 → 人工坐席工作台</div>
+<table>
+  <tr><th>层级</th><th>组成</th><th>说明</th></tr>
+  <tr><td>接入层</td><td>企业微信群机器人 / 微信群托管</td><td>推荐企业微信官方方案；个人微信托管存在封号风险需评估</td></tr>
+  <tr><td>对话引擎</td><td>LLM + 意图识别 + 多轮对话管理</td><td>上下文记忆、追问澄清、人设话术配置</td></tr>
+  <tr><td>知识层</td><td>RAG 知识库 + 案例库 + FAQ</td><td>向量+关键词混合检索，答案带来源，防幻觉</td></tr>
+  <tr><td>业务集成</td><td>CRM / 工单 / 订单 / 物流接口</td><td>线索与工单双向同步</td></tr>
+  <tr><td>人工协同</td><td>客服工作台</td><td>会话接管、上下文摘要、AI 辅助答复建议</td></tr>
+  <tr><td>管理后台</td><td>知识库、规则、看板、权限</td><td>管理员自助维护</td></tr>
+</table>
+
+<h2>六、实施计划与 KPI</h2>
+<table>
+  <tr><th>阶段</th><th>周期</th><th>内容</th></tr>
+  <tr><td>一期：基础上线</td><td>2–4 周</td><td>群接入、知识库、售前/售后自动应答、转人工</td></tr>
+  <tr><td>二期：商机与工单</td><td>3–4 周</td><td>高意向识别推送、工单对接、满意度回访</td></tr>
+  <tr><td>三期：运营深化</td><td>持续</td><td>数据看板、案例自学习、营销触达、预警日报</td></tr>
+</table>
+<table>
+  <tr><th>验收指标</th><th>目标值</th></tr>
+  <tr><td>首次响应时间</td><td>≤ 5 秒</td></tr>
+  <tr><td>问题自助解决率</td><td>≥ 70%</td></tr>
+  <tr><td>回答准确率（抽检）</td><td>≥ 90%</td></tr>
+  <tr><td>转人工率</td><td>≤ 30%</td></tr>
+  <tr><td>高意向线索推送时效</td><td>≤ 1 分钟</td></tr>
+  <tr><td>客户满意度（CSAT）</td><td>≥ 90%</td></tr>
+</table>
+
+<h2>七、风险与对策</h2>
+<table>
+  <tr><th>风险</th><th>对策</th></tr>
+  <tr><td>AI 回答错误/幻觉</td><td>限定知识库作答，无把握即转人工并答复"专员跟进"</td></tr>
+  <tr><td>个人微信封号风险</td><td>优先企业微信官方方案；托管方案控频、模拟真人节奏</td></tr>
+  <tr><td>群内打扰</td><td>@触发/关键词触发可配，营销限频，闲聊不插话</td></tr>
+  <tr><td>数据合规</td><td>加密存储、信息脱敏、权限分级，符合个保法</td></tr>
+  <tr><td>知识库过时</td><td>更新责任人 + 案例自学习 + 低分回答巡检</td></tr>
+</table>
+
+<div class="note">本页为通用基础版方案，演示数据均为模拟。具体接入方式与业务系统接口在立项后确认。</div>
+<footer>微信群智能AI客服 解决方案 · 对话演示版 V1.1 · JSON数据分离版（scenarios.json / kb.json 可独立维护）<br>联系方式：<a href="mailto:lcl3@163.com" style="color:var(--muted)">lcl3@163.com</a></footer>
+</div>
+
+<script>
+/* ================= 内嵌数据（支持直接双击打开） ================= */
+const _scenariosData = [{"id":"presale","title":"① 售前咨询 · 7×24应答","desc":"凌晨咨询产品与价格，AI 秒回并推送资料","script":[["sys","凌晨 01:23 · 人工客服已下班，AI 客服值守中"],["customer","王先生","你们这个产品支持多少人同时使用？企业版和标准版有什么区别？"],["ai","您好，王先生！很高兴为您解答 😊\n\n📌 标准版：支持 50 人并发，含基础功能模块\n📌 企业版：支持 1000+ 并发，增加权限管理、数据报表、API 对接\n\n两个版本均提供 7×24 技术支持。请问您的团队大概多少人使用呢？"],["customer","王先生","我们大概200人，企业版怎么收费？能试用吗？"],["ai","200 人规模推荐【企业版】，更稳定且含专属服务。\n\n💰 报价明细已为您整理，详见手册：\n📎《企业版产品手册+报价单.pdf》\n\n✅ 支持 14 天免费试用，开通仅需 5 分钟。需要我现在为您申请试用名额吗？"],["customer","王先生","好，帮我申请一个，下周想给领导演示"],["ai","已为您提交试用申请 ✅\n\n试用账号将在 10 分钟内发送至您的私信。专属顾问稍后与您对接演示安排，祝您汇报顺利！"],["lead","🔔 高意向线索已推送销售团队","客户：王先生 ｜ 群：产品服务交流群\n意向：企业版·200人·申请试用·下周演示\n意向评分：92/100 ｜ 已分配：销售-李经理"]]},{"id":"order","title":"② 售中下单 · 买课全流程","desc":"选课→下单→催付→开课提醒，全程AI跟进","script":[["customer","林同学","我想报那个数据分析课，怎么买？"],["ai","好的，林同学！为您匹配到 2 个班型：\n\n📚 数据分析实战营（基础班）\n¥1,299 ｜ 8 周 ｜ 适合零基础\n\n📚 数据分析进阶营（项目班）\n¥2,499 ｜ 12 周 ｜ 含 3 个企业级项目 + 就业辅导\n\n请问您目前有编程基础吗？我帮您推荐合适的班型～"],["customer","林同学","学过一点Python，想要带项目的"],["ai","有 Python 基础选【进阶营】正合适 👍\n\n🎁 检测到您是本群学员，可用专属优惠券：立减 ¥300\n到手价：¥2,199（原价 ¥2,499）\n\n已为您生成下单链接：\n🔗 [进阶营报名 · 6月20日开班]\n点击即可支付，名额剩余 7 个。"],["sys","订单已创建 #KC-0612-035 · 状态：待支付"],["customer","林同学","好的我看看"],["sys","30 分钟后 · 检测到订单未支付"],["ai","林同学，您的进阶营订单还差最后一步支付哦～\n\n⏰ 专属优惠券 ¥300 将在 2 小时后失效\n📌 本期仅剩 5 个名额\n\n如果是对课程安排还有疑虑，可以告诉我，或回复"转人工"由课程顾问为您解答 😊"],["customer","林同学","付好了"],["ai","已确认收款 ✅ 恭喜您报名成功！\n\n📋 订单 #KC-0612-035 ｜ 进阶营 6月20日开班\n接下来：\n1️⃣ 班主任将在 24 小时内私信您拉入班级群\n2️⃣ 开班前 3 天推送预习资料\n3️⃣ 电子发票可随时回复"开发票"获取\n\n开班前一天我会再提醒您，祝学习顺利 🎓"],["lead","🔔 成交通知已推送运营/销售","客户：林同学 ｜ 订单：进阶营 ¥2,199\n转化路径：群咨询→AI推荐→优惠券→催付挽单→成交\n动作：分配班主任、加入开班提醒队列"]]},{"id":"aftersale","title":"③ 售后报错 · 案例库解答","desc":"客户发报错截图，AI 识别并给出排查步骤","script":[["customer","刘女士","系统登录一直提示错误，发个截图你们看下 [图片：错误代码 E-4012]"],["ai","已收到截图 🔍 识别到错误码【E-4012】：登录凭证过期。\n\n根据服务案例库，请按以下步骤操作：\n1️⃣ 退出当前账号\n2️⃣ 清除浏览器缓存（Ctrl+Shift+Del）\n3️⃣ 重新登录并勾选"记住设备"\n\n该方案已解决同类问题 156 次，成功率 98%。请操作后告诉我结果～"],["customer","刘女士","按你说的弄好了，能登录了，谢谢！"],["ai","太好了 🎉 问题已解决并归档。\n\n麻烦您对本次服务做个评价：\n⭐⭐⭐⭐⭐ 非常满意 ｜ ⭐⭐⭐ 一般 ｜ ⭐ 不满意"],["customer","刘女士","⭐⭐⭐⭐⭐"],["sys","满意度已记录 · 本次会话沉淀至案例库 #E4012"]]},{"id":"ticket","title":"④ 工单创建 · 转人工","desc":"复杂问题 AI 自动建单并升级人工，带上下文","script":[["customer","陈总","我们账户里的数据导出之后金额对不上，差了三千多，这个问题很严重！"],["ai","非常抱歉给您带来困扰，陈总！数据金额异常属于重要问题，我已为您：\n\n📋 创建工单【#20260612-088】（优先级：高）\n👤 同步升级人工专员处理\n\n请稍候，专员马上接入。"],["sys","AI 已转接 · 上下文摘要已发送人工坐席 · AI 进入静默"],["human","专员-张工","陈总您好，我是技术专员张工，已看到您的导出金额差异问题。请问导出的是哪个时间段的数据？我现在远程核对。"],["customer","陈总","5月份的对账单"],["human","专员-张工","收到，已定位：5月有两笔退款在导出模板中未计入。我们今天 18:00 前修复模板并重发对账单给您，工单进度可随时在群里问小智查询。"],["alert","⚠️ 主管通知","工单 #20260612-088（高优先级）已升级\n客户情绪：着急 ｜ 处理人：张工 ｜ 时限：今日18:00"]]},{"id":"progress","title":"⑤ 进度查询 · 自助服务","desc":"客户随时查询工单/订单进度","script":[["customer","赵先生","@AI客服小智 帮我查下工单 20260612-088 处理到哪一步了"],["ai","为您查询工单【#20260612-088】：\n\n✅ 已受理（10:32）\n✅ 已定位原因（11:05）\n🔄 修复中 — 预计今日 18:00 前完成\n\n完成后我会第一时间在群里通知您 📬"],["customer","赵先生","好的，顺便再查下上个月的发票开了没有"],["ai","已查询：您 5 月份发票（金额 ¥12,800）已于 6 月 3 日开具，电子发票已发送至预留邮箱 zh***@163.com。\n\n如未收到可回复"重发发票"，我帮您重新发送～"]]},{"id":"welcome","title":"⑥ 新人入群 · 营销触达","desc":"新成员欢迎 + 活动通知 + 沉默唤醒","script":[["sys",""吴经理"加入群聊"],["ai","欢迎吴经理加入【产品服务交流群】🎉\n\n我是 AI 客服小智，7×24 小时在线：\n🔹 产品咨询 → 直接提问\n🔹 故障报修 → 发送问题或截图\n🔹 查进度 → 回复"查询+单号"\n🔹 找人工 → 回复"转人工"\n\n新客户专享：本月开通享 8.5 折 🎁"],["customer","吴经理","正好想了解下，你们和XX家的产品比有什么优势？"],["ai","好问题！客观来说各有侧重，我们的差异点：\n\n1️⃣ 部署：支持私有化部署，数据不出企业\n2️⃣ 服务：7×24 响应 + 专属客户成功经理\n3️⃣ 集成：开放 API，已对接主流办公系统\n\n建议您结合实际场景试用对比，14 天免费试用随时可开通 😊"],["sys","系统识别：竞品对比提问 → 已按预设合规口径应答"]]},{"id":"risk","title":"⑦ 舆情预警 · 群日报","desc":"负面情绪监测告警 + 每日运营摘要","script":[["customer","孙女士","怎么又卡了！这周第三次了，你们到底行不行，不行我们就退款换别家！"],["ai","孙女士，非常抱歉让您屡次遇到卡顿问题 🙏 您的反馈我们高度重视：\n\n📋 已创建紧急工单【#20260612-102】\n👤 已升级技术主管直接跟进\n\n主管将在 10 分钟内与您联系，给您一个明确的解决时间表。"],["alert","🚨 舆情预警 · 推送客服主管","触发：负面情绪 + "退款"关键词 + 7日内第3次同类投诉\n客户：孙女士 ｜ 流失风险：高\n建议动作：主管直接介入 + 补偿方案"],["sys","———— 当日 20:00 自动生成 ————"],["ai","📊 今日群服务日报（管理员可见）\n\n咨询总量：47 条 ｜ AI 自助解决：36 条（77%）\n转人工：8 条 ｜ 新建工单：5 个 ｜ 高意向线索：3 条\n热门问题 TOP3：登录异常、企业版报价、发票开具\n⚠️ 风险提示：卡顿类投诉 3 起，建议技术侧排查"]]}];
+const _kbData = {"aiName":"AI客服小智","fallback":"这个问题我已记录 📝 知识库暂无完全匹配的答案，为保证准确性，已为您创建跟进单，专员将在工作时间优先回复您。\n\n您也可以回复"转人工"立即接入人工客服。","rules":[{"keywords":["价格","报价","多少钱","收费","费用"],"reply":"我们提供标准版与企业版两种方案 💰\n\n📎 已为您发送《产品报价单.pdf》\n如需精确报价，告诉我您的团队规模，我来推荐合适版本～\n\n（系统提示：已记录价格咨询，意向评分 +20）"},{"keywords":["试用","体验","demo","演示"],"reply":"✅ 支持 14 天免费试用！\n\n回复"申请试用"即可自动开通，账号 10 分钟内发送至私信，同时会有专属顾问对接您。"},{"keywords":["买课","报名","下单","购买","怎么买"],"reply":"好的！为您匹配到 2 个班型：\n\n📚 基础班 ¥1,299（8周）\n📚 进阶班 ¥2,499（12周·含项目）\n\n🎁 群专属优惠券立减 ¥300。告诉我您的基础情况，我帮您推荐并生成下单链接～"},{"keywords":["报错","错误","故障","bug","卡","崩溃","登录不"],"reply":"收到您的问题 🔍 为了快速定位，请提供：\n\n1️⃣ 错误提示截图或错误码\n2️⃣ 出现时间和操作步骤\n\n我将根据服务案例库为您匹配解决方案；3 分钟内无法解决会自动转人工。"},{"keywords":["转人工","人工","客服","真人"],"reply":"好的，正在为您转接人工客服 👤\n\n已将您的聊天上下文同步给坐席，请稍候（当前排队：1 人，预计等待 < 1 分钟）。转接期间我保持静默。"},{"keywords":["退款","退货","投诉","不满意","差评"],"reply":"非常抱歉给您带来不好的体验 🙏\n\n您的诉求我已记录并创建工单，同时升级人工主管优先处理。主管将在 10 分钟内与您联系。\n\n（系统提示：负面情绪预警已推送主管）"},{"keywords":["发票","开票"],"reply":"发票服务：请提供订单号或开票月份，我帮您查询开具状态；电子发票将发送至预留邮箱，也可回复"重发发票"。"},{"keywords":["进度","查询","工单","订单","物流"],"reply":"请发送您的工单号/订单号（如：20260612-088），我立即为您查询最新处理进度 📋"},{"keywords":["你好","您好","在吗","hi","hello"],"reply":"您好！我是 AI 客服小智，7×24 小时在线 😊\n\n您可以直接提问，比如：产品价格、申请试用、故障报修、查询进度，或回复"转人工"。"},{"keywords":["对比","竞品","区别","优势"],"reply":"我们的核心优势：私有化部署、7×24 服务、开放 API 集成。建议结合您的场景免费试用对比，更直观～"}]};
+
+let AI_NAME = _kbData.aiName;
+let scenarios = _scenariosData;
+let kbRules = _kbData.rules.map(r=>({k:r.keywords, r:r.reply}));
+let fallback = _kbData.fallback;
+
+function loadData(){
+  buildButtons();
+  play(scenarios[0].id);
+}
+
+/* ================= 引擎 ================= */
+const chatEl = document.getElementById("chat");
+const listEl = document.getElementById("scenarioList");
+let timer = [], currentId = null, playing = false;
+
+function buildButtons(){
+  listEl.innerHTML="";
+  scenarios.forEach(s=>{
+    const b=document.createElement("button");
+    b.className="sc-btn"; b.id="btn-"+s.id;
+    b.innerHTML="<b>"+s.title+"</b><span>"+s.desc+"</span>";
+    b.onclick=()=>play(s.id);
+    listEl.appendChild(b);
+  });
+}
+
+function clearTimers(){ timer.forEach(t=>clearTimeout(t)); timer=[]; }
+function clearChat(resetActive){
+  clearTimers(); chatEl.innerHTML=""; playing=false;
+  if(resetActive){ currentId=null; document.querySelectorAll(".sc-btn").forEach(b=>b.classList.remove("active")); }
+}
+function scrollBottom(){ chatEl.scrollTop = chatEl.scrollHeight; }
+
+function addMsg(type, name, text){
+  const m=document.createElement("div");
+  if(type==="sys"){ m.className="sys"; m.textContent=text||name; }
+  else if(type==="lead"){ m.className="lead-card"; m.innerHTML="<b>"+name+"</b>"+text.replace(/\n/g,"<br>"); }
+  else if(type==="alert"){ m.className="alert-card"; m.innerHTML="<b>"+name+"</b>"+text.replace(/\n/g,"<br>"); }
+  else{
+    m.className="msg "+type;
+    const initial = type==="ai" ? "AI" : name.slice(0,1);
+    m.innerHTML='<div class="avatar">'+initial+'</div><div class="body"><div class="name">'+name+'</div><div class="bubble"></div></div>';
+    m.querySelector(".bubble").textContent=text;
+  }
+  chatEl.appendChild(m); scrollBottom();
+}
+
+function showTyping(){
+  hideTyping(); /* 防止重复残留 */
+  const t=document.createElement("div");
+  t.className="msg ai typing-msg";
+  t.innerHTML='<div class="avatar">AI</div><div class="body"><div class="name">'+AI_NAME+'</div><div class="typing"><i></i><i></i><i></i></div></div>';
+  chatEl.appendChild(t); scrollBottom();
+}
+function hideTyping(){ document.querySelectorAll(".typing-msg").forEach(t=>t.remove()); }
+
+function play(id){
+  const s=scenarios.find(x=>x.id===id); if(!s) return;
+  clearChat(false); currentId=id; playing=true;
+  document.querySelectorAll(".sc-btn").forEach(b=>b.classList.toggle("active", b.id==="btn-"+id));
+  let delay=400;
+  s.script.forEach(line=>{
+    const [type,a,b]=line;
+    if(type==="ai"){
+      timer.push(setTimeout(showTyping, delay)); delay+=900;
+      timer.push(setTimeout(()=>{hideTyping(); addMsg("ai", AI_NAME, b);}, delay));
+    } else if(type==="customer"||type==="human"){
+      timer.push(setTimeout(()=>addMsg(type,a,b), delay));
+    } else {
+      timer.push(setTimeout(()=>addMsg(type,a,b), delay));
+    }
+    delay += (type==="customer"?1400 : type==="ai"?1800 : 1300);
+  });
+  timer.push(setTimeout(()=>{playing=false;}, delay));
+}
+function replay(){ if(currentId) play(currentId); }
+
+/* 自由输入 */
+function sendFree(){
+  const inp=document.getElementById("userInput");
+  const txt=inp.value.trim(); if(!txt) return;
+  inp.value="";
+  /* 用户介入时停止剧本播放，避免消息穿插和输入动画残留 */
+  if(playing){ clearTimers(); hideTyping(); playing=false; }
+  addMsg("customer","访客",txt);
+  showTyping();
+  const rule = kbRules.find(r=>r.k.some(k=>txt.toLowerCase().includes(k)));
+  setTimeout(()=>{ hideTyping(); addMsg("ai", AI_NAME, rule?rule.r:fallback); }, 900+Math.random()*500);
+}
+
+/* 加载 JSON 数据并播放第一个场景 */
+loadData();
+</script>
+</body>
+</html>
