@@ -51,6 +51,9 @@ python3 -m http.server 8000
 
 > 演示数据均为模拟，仅用于展示交互效果。
 
+在线演示：
+https://stavedl.github.io/wechat-ai-cs-demo/
+
 ## 联系方式
 
 lcl3@163.com
