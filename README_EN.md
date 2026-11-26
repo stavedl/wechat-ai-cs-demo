@@ -49,6 +49,9 @@ python3 -m http.server 8000
 - **Edit conversation scripts:** Modify `data/scenarios.json`. Each message format: `[type, name, content]`. Supported types: `customer`, `ai`, `human`, `sys`, `lead`, `alert`.
 - **Edit free-input Q&A:** Modify `data/kb.json`. Each rule matches any keyword in `keywords` and returns `reply`. `fallback` is used when no rule matches.
 
+Online Demo：
+https://stavedl.github.io/wechat-ai-cs-demo/
+
 > All demo data is simulated and for display purposes only.
 
 ## Contact
